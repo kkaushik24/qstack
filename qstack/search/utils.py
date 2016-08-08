@@ -83,6 +83,7 @@ class AnswerEngine(object):
             answer_html = crawl_answer_from_question(question_for_query)
             question_for_query.answer_html = answer_html
             question_for_query.save()
+        if question_for_query and question_for_query.answer_html:
             answer_html = question_for_query.answer_html
         return answer_html
 
