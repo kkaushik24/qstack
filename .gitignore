@@ -1,0 +1,17 @@
+*.pyc
+*.pyo
+*.o
+*.cgi
+*.log
+*.*~
+
+migrations/
+media/
+*.swp
+*.swo
+localfiles/
+static/
+
+
+
+
