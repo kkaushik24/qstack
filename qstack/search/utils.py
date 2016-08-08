@@ -18,7 +18,7 @@ class QuestionEngine(object):
                                                 'accepted': True})
         self._query_url = self._base_url + '?' + self._encoded_query
         self._stackoverflow_response = {}
-        self._question_list = None
+        self._question_list = []
 
     def get_response_from_stackoverflow(self):
         response = requests.get(self._query_url)
@@ -68,7 +68,7 @@ class AnswerEngine(object):
 
     def _rank_questions(self):
         if self._questions:
-            self._question = self._questions.order_by('-stackoverflow_view_count')
+            self._questions = self._questions.order_by('-stackoverflow_view_count')
 
     def get_answer(self):
         self._search_local_db()
@@ -79,11 +79,11 @@ class AnswerEngine(object):
         if self._questions:
             question_for_query = self._questions[0]
         answer_html = ''
-        if not question_for_query.answer_html:
+        if question_for_query and not question_for_query.answer_html:
             answer_html = crawl_answer_from_question(question_for_query)
-            question_for_query.answer_html = answer_html.encode('utf-8')
+            question_for_query.answer_html = answer_html
             question_for_query.save()
-        answer_html = question_for_query.answer_html
+            answer_html = question_for_query.answer_html
         return answer_html
 
 
@@ -96,5 +96,5 @@ def crawl_answer_from_question(question):
         answer_html = ''
         answer = answer_div.find('td', {'class': 'answercell'})
         if answer:
-            answer_html = str(answer)
+            answer_html = unicode(answer.prettify(), 'utf-8')
         return answer_html
