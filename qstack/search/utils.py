@@ -33,6 +33,8 @@ class QuestionEngine(object):
             self._index_questions(question_items, query.pk)
 
     def _index_questions(self, question_items, query_id):
+        question_ids_before = list(QueryQuestion.objects.all().values_list(
+                                'id', flat=True))
         question_list = [QueryQuestion(query_id=query_id,
                          title=question.get('title', ''),
                          stackoverflow_view_count=question.get('view_count',
@@ -43,7 +45,9 @@ class QuestionEngine(object):
                          stackoverflow_link=question.get('link'),
                          stackoverflow_score_count=question.get('score_count', 0))
                          for question in question_items]
-        self._question_list = QueryQuestion.objects.bulk_create(question_list)
+        QueryQuestion.objects.bulk_create(question_list)
+        self._question_list = QueryQuestion.objects.exclude(
+                                id__in=question_ids_before)
 
     def get_questions(self):
         question_ids = [question.id for question in self._question_list]

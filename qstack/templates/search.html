@@ -1,56 +1,55 @@
+{% load staticfiles %}
 <html>
     <head>
-        <style>
-            body {
-                  background-color: linen;
-                  height: 100%;
-                  width: 100%;
-                  padding: 0px;
-                  margin: 0px, 50px;
-                 }
-            p {
-                color: #cc5500;
-                text-align: center;
-                }
-            .head {
-                color: #cc5500;
-                text-align: center;
-                font-size: 100px
-                }
-            input[type=text] {
-                width: 89%;
-                padding: 12px 20px;
-                margin: 8px 0;
-                box-sizing: border-box;
-                border: 2px solid red;
-                border-radius: 4px;
-            }
-            .button {
-                background-color: #4CAF50;
-                border: none;
-                color: white;
-                padding: 15px 32px;
-                text-align: center;
-                text-decoration: none;
-                display: inline-block;
-                font-size: 16px;
-                margin: 4px 2px;
-                cursor: pointer;
-            }
-</style>
-</head>
+        <!-- custom search css -->
+        <link rel="stylesheet" href="{% static 'search.css' %}">
+        <!-- font awesome css -->
+        <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.6.3/css/font-awesome.min.css" rel="stylesheet" integrity="sha384-T8Gy5hrqNKT+hzMclPo118YTQO6cYprQmhrYwIiQ/3axmI1hQomh7Ud2hPOy8SP1" crossorigin="anonymous">
+    </head>
     <title>qstack search</title>
     <body>
         <p>
-        <div class="head"> qstack </div>
-            <form action="{% url process_search %}">
+        <div class="head"> 
+           <i class="fa fa-stack-overflow" aria-hidden="true"></i> qstack 
+        </div>
+            <form id="search-form" action="">
                 {{search_form.query}}
                 <input type="submit" class='button' value="Submit">
             </form>
-            {% autoescape off %}            
-                {{answer}}
-            {% endautoescape  %}
+            <div class="loader hidden">
+                    <i class="fa fa-spinner fa-spin fa-3x fa-fw"></i>
+                    <span class="sr-only">Loading...</span>
+            </div>
+            <div id="answer-content">
+                
+            </div>
         </p>
     </body>
 </html>
+<!-- jquery cdn script -->
+<script   src="https://code.jquery.com/jquery-1.12.4.min.js"   integrity="sha256-ZosEbRLbNQzLpnKIkEdrPv7lOy9C27hHQ+Xp8a4MxAQ="   crossorigin="anonymous"></script>
+<script>
+   $(document).ready(function() {
+    //do jQuery stuff when DOM is ready
+    $("#search-form").submit(function(e) {
+    $(".loader").removeClass("hidden"); 
+    $("#answer-content").html("");
 
+    var url = "{% url process_search %}"; // the script where you handle the form input.
+
+    $.ajax({
+           type: "GET",
+           url: url,
+           data: $("#search-form").serialize(), // serializes the form's elements.
+           success: function(data)
+           {
+                $(".loader").addClass("hidden"); 
+                $("#answer-content").html(data["response"]);
+           }
+         });
+
+    e.preventDefault(); // avoid to execute the actual submit of the form.
+    }); 
+    }); 
+
+</script>
